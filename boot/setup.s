@@ -228,297 +228,297 @@ chsvga:	cld
 	mov	%ax, %es
 	lea	msg1, %si
 	call	prtstr
-nokey:	in	al,#0x60
-	cmp	al,#0x82
+nokey:	in	$0x60, %al
+	cmp	$0x82, %al
 	jb	nokey
-	cmp	al,#0xe0
+	cmp	$0xe0, %al
 	ja	nokey
-	cmp	al,#0x9c
+	cmp	$0x9c, %al
 	je	svga
-	mov	ax,#0x5019
-	pop	ds
+	mov	$0x5019, %ax
+	pop	%ds
 	ret
-svga:	lea 	si,idati		# Check ATI 'clues'
-	mov	di,#0x31
-	mov 	cx,#0x09
+svga:	lea 	idati, %si		# Check ATI 'clues'
+	mov	$0x31, %di
+	mov $0x09, %cx
 	repe
 	cmpsb
 	jne	noati
-	lea	si,dscati
-	lea	di,moati
-	lea	cx,selmod
-	jmp	cx
-noati:	mov	ax,#0x200f		# Check Ahead 'clues'
-	mov	dx,#0x3ce
-	out	dx,ax
-	inc	dx
-	in	al,dx
-	cmp	al,#0x20
+	lea	dscati, %si
+	lea	moati, %di
+	lea	selmod, %cx
+	jmp	*%cx
+noati:	mov	$0x200f, %ax		# Check Ahead 'clues'
+	mov	$0x3ce, %dx
+	out	%ax, %dx
+	inc	%dx
+	in	%dx, %al
+	cmp	$0x20, %al
 	je	isahed
-	cmp	al,#0x21
+	cmp	$0x21, %al
 	jne	noahed
-isahed:	lea	si,dscahead
-	lea	di,moahead
-	lea	cx,selmod
-	jmp	cx
-noahed:	mov	dx,#0x3c3		# Check Chips & Tech. 'clues'
-	in	al,dx
-	or	al,#0x10
-	out	dx,al
-	mov	dx,#0x104		
-	in	al,dx
-	mov	bl,al
-	mov	dx,#0x3c3
-	in	al,dx
-	and	al,#0xef
-	out	dx,al
-	cmp	bl,[idcandt]
+isahed:	lea	dscahead, %si
+	lea	moahead, %di
+	lea	selmod, %cx
+	jmp	*%cx
+noahed:	mov	$0x3c3, %dx		# Check Chips & Tech. 'clues'
+	in	%dx, %al
+	or	$0x10, %al
+	out	%al, %dx
+	mov	$0x104, %dx		
+	in	%dx, %al
+	mov	%al, %bl
+	mov	$0x3c3, %dx
+	in	%dx, %al
+	and	$0xef, %al
+	out	%al, %dx
+	cmp	(idcandt), %bl
 	jne	nocant
-	lea	si,dsccandt
-	lea	di,mocandt
-	lea	cx,selmod
-	jmp	cx
-nocant:	mov	dx,#0x3d4		# Check Cirrus 'clues'
-	mov	al,#0x0c
-	out	dx,al
-	inc	dx
-	in	al,dx
-	mov	bl,al
-	xor	al,al
-	out	dx,al
-	dec	dx
-	mov	al,#0x1f
-	out	dx,al
-	inc	dx
-	in	al,dx
-	mov	bh,al
-	xor	ah,ah
-	shl	al,#4
-	mov	cx,ax
-	mov	al,bh
-	shr	al,#4
-	add	cx,ax
-	shl	cx,#8
-	add	cx,#6
-	mov	ax,cx
-	mov	dx,#0x3c4
-	out	dx,ax
-	inc	dx
-	in	al,dx
-	and	al,al
+	lea	dsccandt, %si
+	lea	mocandt, %di
+	lea	selmod, %cx
+	jmp	*%cx
+nocant:	mov	$0x3d4, %dx		# Check Cirrus 'clues'
+	mov	$0x0c, %al
+	out	%al, %dx
+	inc	%dx
+	in	%dx, %al
+	mov	%al, %bl
+	xor	%al, %al
+	out	%al, %dx
+	dec	%dx
+	mov	$0x1f, %al
+	out	%al, %dx
+	inc	%dx
+	in	%dx, %al
+	mov	%al, %bh
+	xor	%ah, %ah
+	shl	$4, %al
+	mov	%ax, %cx
+	mov	%bh, %al
+	shr	$4, %al
+	add	%ax, %cx
+	shl	$8, %cx
+	add	$6, %cx
+	mov	%cx, %ax
+	mov	$0x3c4, %dx
+	out	%ax, %dx
+	inc	%dx
+	in	%dx, %al
+	and	%al, %al
 	jnz	nocirr
-	mov	al,bh
-	out	dx,al
-	in	al,dx
-	cmp	al,#0x01
+	mov	%bh, %al
+	out	%al, %dx
+	in	%dx, %al
+	cmp	$0x01, %al
 	jne	nocirr
 	call	rst3d4	
-	lea	si,dsccirrus
-	lea	di,mocirrus
-	lea	cx,selmod
-	jmp	cx
-rst3d4:	mov	dx,#0x3d4
-	mov	al,bl
-	xor	ah,ah
-	shl	ax,#8
-	add	ax,#0x0c
-	out	dx,ax
+	lea	dsccirrus, %si
+	lea	mocirrus, %di
+	lea	selmod, %cx
+	jmp	*%cx
+rst3d4:	mov	$0x3d4, %dx
+	mov	%bl, %al
+	xor	%ah, %ah
+	shl	$8, %ax
+	add	$0x0c, %ax
+	out	%ax, %dx
 	ret	
 nocirr:	call	rst3d4			# Check Everex 'clues'
-	mov	ax,#0x7000
-	xor	bx,bx
-	int	0x10
-	cmp	al,#0x70
+	mov	$0x7000, %ax
+	xor	%bx, %bx
+	int	$0x10
+	cmp	$0x70, %al
 	jne	noevrx
-	shr	dx,#4
-	cmp	dx,#0x678
+	shr	$4, %dx
+	cmp	$0x678, %dx
 	je	istrid
-	cmp	dx,#0x236
+	cmp	$0x236, %dx
 	je	istrid
-	lea	si,dsceverex
-	lea	di,moeverex
-	lea	cx,selmod
-	jmp	cx
-istrid:	lea	cx,ev2tri
-	jmp	cx
-noevrx:	lea	si,idgenoa		# Check Genoa 'clues'
-	xor 	ax,ax
-	seg es
-	mov	al,[0x37]
-	mov	di,ax
-	mov	cx,#0x04
-	dec	si
-	dec	di
-l1:	inc	si
-	inc	di
-	mov	al,(si)
-	seg es
-	and	al,(di)
-	cmp	al,(si)
+	lea	dsceverex, %si
+	lea	moeverex, %di
+	lea	selmod, %cx
+	jmp	*%cx
+istrid:	lea	ev2tri, %cx
+	jmp	*%cx
+noevrx:	lea	idgenoa, %si		# Check Genoa 'clues'
+	xor 	%ax, %ax
+	#seg es
+	mov	%es:(0x37), %al
+	mov	%ax, %di
+	mov	$0x04, %cx
+	dec	%si
+	dec	%di
+l1:	inc	%si
+	inc	%di
+	mov	(%si), %al
+	#seg es
+	and	%es:(%di), %al
+	cmp	(%si), %al
 	loope 	l1
-	cmp	cx,#0x00
+	cmp	$0x00, %cx
 	jne	nogen
-	lea	si,dscgenoa
-	lea	di,mogenoa
-	lea	cx,selmod
-	jmp	cx
-nogen:	lea	si,idparadise		# Check Paradise 'clues'
-	mov	di,#0x7d
-	mov	cx,#0x04
+	lea	dscgenoa, %si
+	lea	mogenoa, %di
+	lea	selmod, %cx
+	jmp	*%cx
+nogen:	lea	idparadise, %si		# Check Paradise 'clues'
+	mov	$0x7d, %di
+	mov	$0x04, %cx
 	repe
 	cmpsb
 	jne	nopara
-	lea	si,dscparadise
-	lea	di,moparadise
-	lea	cx,selmod
-	jmp	cx
-nopara:	mov	dx,#0x3c4		# Check Trident 'clues'
-	mov	al,#0x0e
-	out	dx,al
-	inc	dx
-	in	al,dx
-	xchg	ah,al
-	mov	al,#0x00
-	out	dx,al
-	in	al,dx
-	xchg	al,ah
-	mov	bl,al		# Strange thing ... in the book this wasn't
-	and	bl,#0x02	# necessary but it worked on my card which
+	lea	dscparadise, %si
+	lea	moparadise, %di
+	lea	selmod, %cx
+	jmp	*%cx
+nopara:	mov	$0x3c4, %dx		# Check Trident 'clues'
+	mov	$0x0e, %al
+	out	%al, %dx
+	inc	%dx
+	in	%dx, %al
+	xchg	%al, %ah
+	mov	$0x00, %al
+	out	%al, %dx
+	in	%dx, %al
+	xchg	%ah, %al
+	mov	%al, %bl		# Strange thing ... in the book this wasn't
+	and	$0x02, %bl	# necessary but it worked on my card which
 	jz	setb2		# is a trident. Without it the screen goes
-	and	al,#0xfd	# blurred ...
+	and	$0xfd, %al	# blurred ...
 	jmp	clrb2		#
-setb2:	or	al,#0x02	#
-clrb2:	out	dx,al
-	and	ah,#0x0f
-	cmp	ah,#0x02
+setb2:	or	$0x02, %al	#
+clrb2:	out	%al, %dx
+	and	$0x0f, %ah
+	cmp	$0x02, %ah
 	jne	notrid
-ev2tri:	lea	si,dsctrident
-	lea	di,motrident
-	lea	cx,selmod
-	jmp	cx
-notrid:	mov	dx,#0x3cd		# Check Tseng 'clues'
-	in	al,dx			# Could things be this simple # :-)
-	mov	bl,al
-	mov	al,#0x55
-	out	dx,al
-	in	al,dx
-	mov	ah,al
-	mov	al,bl
-	out	dx,al
-	cmp	ah,#0x55
+ev2tri:	lea	dsctrident, %si
+	lea	motrident, %di
+	lea	selmod, %cx
+	jmp	*%cx
+notrid:	mov	$0x3cd, %dx		# Check Tseng 'clues'
+	in	%dx, %al			# Could things be this simple # :-)
+	mov	%al, %bl
+	mov	$0x55, %al
+	out	%al, %dx
+	in	%dx, %al
+	mov	%al, %ah
+	mov	%bl, %al
+	out	%al, %dx
+	cmp	$0x55, %ah
  	jne	notsen
-	lea	si,dsctseng
-	lea	di,motseng
-	lea	cx,selmod
-	jmp	cx
-notsen:	mov	dx,#0x3cc		# Check Video7 'clues'
-	in	al,dx
-	mov	dx,#0x3b4
-	and	al,#0x01
+	lea	dsctseng, %si
+	lea	motseng, %di
+	lea	selmod, %cx
+	jmp	*%cx
+notsen:	mov	$0x3cc, %dx		# Check Video7 'clues'
+	in	%dx, %al
+	mov	$0x3b4, %dx
+	and	$0x01, %al
 	jz	even7
-	mov	dx,#0x3d4
-even7:	mov	al,#0x0c
-	out	dx,al
-	inc	dx
-	in	al,dx
-	mov	bl,al
-	mov	al,#0x55
-	out	dx,al
-	in	al,dx
-	dec	dx
-	mov	al,#0x1f
-	out	dx,al
-	inc	dx
-	in	al,dx
-	mov	bh,al
-	dec	dx
-	mov	al,#0x0c
-	out	dx,al
-	inc	dx
-	mov	al,bl
-	out	dx,al
-	mov	al,#0x55
-	xor	al,#0xea
-	cmp	al,bh
+	mov	$0x3d4, %dx
+even7:	mov	$0x0c, %al
+	out	%al, %dx
+	inc	%dx
+	in	%dx, %al
+	mov	%al, %bl
+	mov	$0x55, %al
+	out	%al, %dx
+	in	%dx, %al
+	dec	%dx
+	mov	$0x1f, %al
+	out	%al, %dx
+	inc	%dx
+	in	%dx, %al
+	mov	%al, %bh
+	dec	%dx
+	mov	$0x0c, %al
+	out	%al, %dx
+	inc	%dx
+	mov	%bl, %al
+	out	%al, %dx
+	mov	$0x55, %al
+	xor	$0xea, %al
+	cmp	%bh, %al
 	jne	novid7
-	lea	si,dscvideo7
-	lea	di,movideo7
-selmod:	push	si
-	lea	si,msg2
+	lea	dscvideo7, %si
+	lea	movideo7, %di
+selmod:	push	%si
+	lea	msg2, %si
 	call	prtstr
-	xor	cx,cx
-	mov	cl,(di)
-	pop	si
-	push	si
-	push	cx
-tbl:	pop	bx
-	push	bx
-	mov	al,bl
-	sub	al,cl
+	xor	%cx, %cx
+	mov	(%di), %cl
+	pop	%si
+	push	%si
+	push	%cx
+tbl:	pop	%bx
+	push	%bx
+	mov	%bl, %al
+	sub	%cl, %al
 	call	dprnt
 	call	spcing
 	lodsw
-	xchg	al,ah
+	xchg	%ah, %al
 	call	dprnt
-	xchg	ah,al
-	push	ax
-	mov	al,#0x78
+	xchg	%al, %ah
+	push	%ax
+	mov	$0x78, %al
 	call	prnt1
-	pop	ax
+	pop	%ax
 	call	dprnt
 	call	docr
 	loop	tbl
-	pop	cx
+	pop	%cx
 	call	docr
-	lea	si,msg3
+	lea	msg3, %si
 	call	prtstr
-	pop	si
-	add	cl,#0x80
-nonum:	in	al,#0x60	# Quick and dirty...
-	cmp	al,#0x82
+	pop	%si
+	add	$0x80, %cl
+nonum:	in	$0x60, %al	# Quick and dirty...
+	cmp	$0x82, %al
 	jb	nonum
-	cmp	al,#0x8b
+	cmp	$0x8b, %al
 	je	zero
-	cmp	al,cl
+	cmp	%cl, %al
 	ja	nonum
 	jmp	nozero
-zero:	sub	al,#0x0a
-nozero:	sub	al,#0x80
-	dec	al
-	xor	ah,ah
-	add	di,ax
-	inc	di
-	push	ax
-	mov	al,(di)
-	int 	0x10
-	pop	ax
-	shl	ax,#1
-	add	si,ax
+zero:	sub	$0x0a, %al
+nozero:	sub	$0x80, %al
+	dec	%al
+	xor	%ah, %ah
+	add	%ax, %di
+	inc	%di
+	push	%ax
+	mov	(%di), %al
+	int 	$0x10
+	pop	%ax
+	shl	$1, %ax
+	add	%ax, %si
 	lodsw
-	pop	ds
+	pop	%ds
 	ret
-novid7:	pop	ds	# Here could be code to support standard 80x50,80x30
-	mov	ax,#0x5019	
+novid7:	pop	%ds	# Here could be code to support standard 80x50,80x30
+	mov	$0x5019, %ax	
 	ret
 
 # Routine that 'tabs' to next col.
 
-spcing:	mov	al,#0x2e
+spcing:	mov	$0x2e, %al
 	call	prnt1
-	mov	al,#0x20
+	mov	$0x20, %al
 	call	prnt1	
-	mov	al,#0x20
+	mov	$0x20, %al
 	call	prnt1	
-	mov	al,#0x20
+	mov	$0x20, %al
 	call	prnt1	
-	mov	al,#0x20
+	mov	$0x20, %al
 	call	prnt1
 	ret	
 
 # Routine to print asciiz-string at DS:SI
 
 prtstr:	lodsb
-	and	al,al
+	and	%al, %al
 	jz	fin
 	call	prnt1
 	jmp	prtstr
@@ -527,49 +527,49 @@ fin:	ret
 # Routine to print a decimal value on screen, the value to be
 # printed is put in al (i.e 0-255). 
 
-dprnt:	push	ax
-	push	cx
-	mov	ah,#0x00		
-	mov	cl,#0x0a
-	idiv	cl
-	cmp	al,#0x09
+dprnt:	push	%ax
+	push	%cx
+	mov	$0x00, %ah		
+	mov	$0x0a, %cl
+	idiv	%cl
+	cmp	$0x09, %al
 	jbe	lt100
 	call	dprnt
 	jmp	skip10
-lt100:	add	al,#0x30
+lt100:	add	$0x30, %al
 	call	prnt1
-skip10:	mov	al,ah
-	add	al,#0x30
+skip10:	mov	%ah, %al
+	add	$0x30, %al
 	call	prnt1	
-	pop	cx
-	pop	ax
+	pop	%cx
+	pop	%ax
 	ret
 
 # Part of above routine, this one just prints ascii al
 
-prnt1:	push	ax
-	push	cx
-	mov	bh,#0x00
-	mov	cx,#0x01
-	mov	ah,#0x0e
-	int	0x10
-	pop	cx
-	pop	ax
+prnt1:	push	%ax
+	push	%cx
+	mov	$0x00, %bh
+	mov	$0x01, %cx
+	mov	$0x0e, %ah
+	int	$0x10
+	pop	%cx
+	pop	%ax
 	ret
 
 # Prints <CR> + <LF>
 
-docr:	push	ax
-	push	cx
-	mov	bh,#0x00
-	mov	ah,#0x0e
-	mov	al,#0x0a
-	mov	cx,#0x01
-	int	0x10
-	mov	al,#0x0d
-	int	0x10
-	pop	cx
-	pop	ax
+docr:	push	%ax
+	push	%cx
+	mov	$0x00, %bh
+	mov	$0x0e, %ah
+	mov	$0x0a, %al
+	mov	$0x01, %cx
+	int	$0x10
+	mov	$0x0d, %al
+	int	$0x10
+	pop	%cx
+	pop	%ax
 	ret	
 	
 gdt:
@@ -594,11 +594,11 @@ gdt_48:
 	.word	512+gdt,0x9	# gdt base = 0X9xxxx
 
 msg1:		.ascii	"Press <RETURN> to see SVGA-modes available or any other key to continue."
-		db	0x0d, 0x0a, 0x0a, 0x00
+		.byte	0x0d, 0x0a, 0x0a, 0x00
 msg2:		.ascii	"Mode:  COLSxROWS:"
-		db	0x0d, 0x0a, 0x0a, 0x00
+		.byte	0x0d, 0x0a, 0x0a, 0x00
 msg3:		.ascii	"Choose mode by pressing the corresponding number."
-		db	0x0d, 0x0a, 0x00
+		.byte	0x0d, 0x0a, 0x00
 		
 idati:		.ascii	"761295520"
 idcandt:	.byte	0xa5
