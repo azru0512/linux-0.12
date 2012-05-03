@@ -33,7 +33,7 @@ void do_rd_request(void)
 		goto repeat;
 	}
 	if (CURRENT-> cmd == WRITE) {
-		(void ) memcpy(addr,
+		(void) memcpy(addr,
 			      CURRENT->buffer,
 			      len);
 	} else if (CURRENT->cmd == READ) {
