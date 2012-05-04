@@ -386,8 +386,8 @@ LC10:
 LC11:
 	.ascii "\12\15child %d died with code %04x\12\15\0"
 	.align 2
-.globl _init
-_init:
+.globl init
+init:
 	pushl %ebp
 	movl %esp,%ebp
 	subl $4,%esp

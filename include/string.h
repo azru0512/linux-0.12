@@ -276,7 +276,7 @@ extern char * ___strtok;
 
 extern inline char * strtok(char * s,const char * ct)
 {
-register char * __res __asm__("si");
+register char * __res;
 __asm__("testl %1,%1\n\t"
 	"jne 1f\n\t"
 	"testl %0,%0\n\t"
@@ -378,7 +378,7 @@ return __res;
 
 extern inline void * memchr(const void * cs,char c,int count)
 {
-register void * __res __asm__("di");
+register void * __res;
 if (!count)
 	return NULL;
 __asm__("cld\n\t"
