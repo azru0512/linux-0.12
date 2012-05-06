@@ -12,8 +12,9 @@
  * the page directory.
  */
 .text
-.globl _idt,_gdt,_pg_dir,_tmp_floppy_area
+.globl idt,gdt,_pg_dir,_tmp_floppy_area
 _pg_dir:
+.globl startup_32
 startup_32:
 	movl $0x10,%eax
 	mov %ax,%ds
@@ -81,7 +82,7 @@ setup_idt:
 	movw %dx,%ax		/* selector = 0x0008 = cs */
 	movw $0x8E00,%dx	/* interrupt gate - dpl=0, present */
 
-	lea _idt,%edi
+	lea idt,%edi
 	mov $256,%ecx
 rp_sidt:
 	movl %eax,(%edi)
@@ -159,7 +160,7 @@ ignore_int:
 	mov %ax,%es
 	mov %ax,%fs
 	pushl $int_msg
-	call _printk
+	call printk
 	popl %eax
 	pop %fs
 	pop %es
@@ -221,17 +222,17 @@ setup_paging:
 .word 0
 idt_descr:
 	.word 256*8-1		# idt contains 256 entries
-	.long _idt
+	.long idt
 .align 2
 .word 0
 gdt_descr:
 	.word 256*8-1		# so does gdt (not that that's any
-	.long _gdt		# magic number, but it works for me :^)
+	.long gdt		# magic number, but it works for me :^)
 
 	.align 8
-_idt:	.fill 256,8,0		# idt is uninitialized
+idt:	.fill 256,8,0		# idt is uninitialized
 
-_gdt:	.quad 0x0000000000000000	/* NULL descriptor */
+gdt:	.quad 0x0000000000000000	/* NULL descriptor */
 	.quad 0x00c09a0000000fff	/* 16Mb */
 	.quad 0x00c0920000000fff	/* 16Mb */
 	.quad 0x0000000000000000	/* TEMPORARY - don't use */
