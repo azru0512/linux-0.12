@@ -137,7 +137,7 @@ after_page_tables:
 	pushl $0
 	pushl $0
 	pushl $L6		# return address for main, if it decides to.
-	pushl $_main
+	pushl $main
 	jmp setup_paging
 L6:
 	jmp L6			# main should never return here, but
